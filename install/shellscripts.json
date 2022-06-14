@@ -3,11 +3,13 @@
         {
             "update-user-perms": "sudo usermod -aG dialout,sudo,input $USER",
             "add-ros-source": [
-                "sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main\" > /etc/apt/sources.list.d/ros-latest.list'",
-                "sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654",
-                "sudo apt-get update"
+                "sudo apt update && sudo apt install curl gnupg lsb-release",
+                "sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg",
+                "echo 'deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main' | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null",
+                "sudo apt update",
+                "sudo apt upgrade"
             ],
-            "install-utils": "sudo apt-get install git nano net-tools openssh-server ros-melodic-desktop python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential ros-melodic-serial ros-melodic-joy ros-melodic-twist-mux ros-melodic-tf2-geometry-msgs ros-melodic-robot-localization ros-melodic-gmapping ros-melodic-move-base -y",
+            "install-utils": "sudo apt-get install git nano can-utils net-tools openssh-server ros-humble-desktop python3-rosdep2 python3-colcon-common-extensions ros-humble-slam-toolbox ros-humble-robot-localization",
             "remove-modemmanger": "sudo apt-get remove modemmanager -y",
             "update-ros-dept": [
                 "sudo rosdep init",
@@ -31,31 +33,8 @@
                 "    echo \"create_rover_ros_env: Failure\" >> $KEY_VERIFICATION_FILE",
                 "fi"
             ],
-            "create_rover_roscore": [
-                "cat << EOF2 | sudo tee /etc/systemd/system/roscore.service",
-                "[Unit]",
-                "After=NetworkManager.service time-sync.target",
-                "[Service]",
-                "Type=forking",
-                "User=$USER",
-                " ExecStart=/bin/sh -c \". /opt/ros/melodic/setup.sh; . /etc/roverrobotics/env.sh; roscore & while ! echo exit | nc localhost 11311 > /dev/null; do sleep 1; done\" ",
-                "[Install]",
-                "WantedBy=multi-user.target",
-                "EOF2",
-                "sudo systemctl enable roscore.service",
-                "if [ -f /etc/systemd/system/roscore.service ]",
-                "then",
-                "    echo \"create_rover_roscore: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"create_rover_roscore: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ],
             "create_rover_startup_service": [
                 "cat << EOF3 | sudo tee /etc/systemd/system/roverrobotics.service",
-                "[Unit]",
-                "Requires=roscore.service",
-                "PartOf=roscore.service",
-                "After=NetworkManager.service time-sync.target roscore.service",
                 "[Service]",
                 "Type=simple",
                 "User=$USER",
@@ -73,58 +52,12 @@
             ]
         }
     ],
-    "ds4": [
-        {
-            "download_ds4_driver_ros1": [
-                "mkdir -p ~/catkin_ws/src",
-                "cd ~/catkin_ws/src/",
-                "git clone $KEY_DS4_ROS $KEYV_DS4_ROS",
-                "if [ -d ~/catkin_ws/src/$KEYV_DS4_ROS ]",
-                "then",
-                "    echo \"download_ds4_driver_ros1: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"download_ds4_driver_ros1: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ],
-            "install_ds4_driver": [
-                "mkdir -p ~/drivers",
-                "cd ~/drivers",
-                "git clone $KEY_DS4_DRV ds4drv",
-                "cd ds4drv",
-                "mkdir -p ~/.local/lib/python2.7/site-packages",
-                "python2 setup.py install --prefix ~/.local",
-                "sudo cp -rf udev/50-ds4drv.rules /etc/udev/rules.d/",
-                "sudo udevadm control --reload-rules && sudo udevadm trigger",
-                "if [ -f ~/.local/bin/ds4drv ]",
-                "then",
-                "    echo \"install_ds4_driver: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"install_ds4_driver: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ]
-        }
-    ],
-    "rover_test_repo": [
-        {
-            "download_test_repo": [
-                "cd ./testing",
-                "git clone $KEY_ROVER_TESTS $KEYV_ROVER_TESTS",
-                "if [ -d ./$KEYV_ROVER_TESTS ]",
-                "then",
-                "    echo \"download_test_repo: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"download_test_repo: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ]
-        }
-    ],
     "rpilidar_repo": [
         {
             "download_rpi_lidar": [
-                "mkdir -p ~/catkin_ws/src",
-                "cd ~/catkin_ws/src/",
+                "cd ~/rover_workspace/src/",
                 "git clone $KEY_RPI_ROS $KEYV_RPI_ROS",
-                "if [ -d ~/catkin_ws/src/$KEYV_RPI_ROS ]",
+                "if [ -d ~/rover_workspace/src/$KEYV_RPI_ROS ]",
                 "then",
                 "    echo \"rpilidar_repo: Success\" >> $KEY_VERIFICATION_FILE",
                 "else",
@@ -138,10 +71,9 @@
             "create_startup_script": [
                 "cat << \"EOF2\" | sudo tee /usr/sbin/roverrobotics",
                 "#!/bin/bash",
-                "source ~/catkin_ws/devel/setup.bash",
+                "source ~/rover_workspace/install/setup.sh",
                 "source /etc/roverrobotics/env.sh",
-                "export ROS_HOME=$(echo /home/$USER)/.ros",
-                "roslaunch placeholder &",
+                "ros2 launch roverrobotics_driver mini_teleop.launch.py",
                 "PID=$!",
                 "wait \"$PID\"",
                 "EOF2",
@@ -159,8 +91,6 @@
         {
             "create_can_service": [
                 "cat << EOF6 | sudo tee /etc/systemd/system/can.service",
-                "[Unit]",
-                "After=NetworkManager.service time-sync.target roscore.service",
                 "[Service]",
                 "Type=simple",
                 "User=root",
@@ -179,11 +109,6 @@
             "create_can_script": [
                 "cat << EOF7 | sudo tee /enablecan.sh",
                 "#!/bin/bash",
-                "sudo busybox devmem 0x0c303000 32 0x0000C400",
-                "sudo busybox devmem 0x0c303008 32 0x0000C458",
-                "sudo modprobe can",
-                "sudo modprobe can_raw",
-                "sudo modprobe mttcan",
                 "sudo ip link set can0 type can bitrate 500000 sjw 127 dbitrate 2000000 dsjw 15 berr-reporting on fd on",
                 "#sudo ip link set can1 type can bitrate 500000 dbitrate 2000000 berr-reporting on fd on",
                 "sudo ip link set up can0",
@@ -198,9 +123,6 @@
                 "fi"
             ],
             "enable_can_once": [
-                "sudo modprobe can",
-                "sudo modprobe can_raw",
-                "sudo modprobe mttcan",
                 "sudo ip link set can0 type can bitrate 500000 sjw 127 dbitrate 2000000 dsjw 15 berr-reporting on fd on",
                 "sudo ip link set up can0",
                 "if ifconfig | grep -q can0 ",
@@ -212,13 +134,13 @@
             ]
         }
     ],
-    "roverrobotics_ros1": [
+    "roverrobotics_ros2": [
         {
             "download_roverrobotics_ros1": [
-                "mkdir -p ~/catkin_ws/src",
-                "cd ~/catkin_ws/src/",
-                "git clone $KEY_ROVER_ROS1 $KEYV_ROVER_ROS1",
-                "if [ -d ~/catkin_ws/src/$KEYV_ROVER_ROS1 ]",
+                "mkdir -p ~/rover_workspace/src",
+                "cd ~/rover_workspace/src/",
+                "git clone $KEY_ROVER_ROS2",
+                "if [ -d ~/rover_workspace/src/$KEYV_ROVER_ROS2 ]",
                 "then",
                 "    echo \"download_roverrobotics_ros1: Success\" >> $KEY_VERIFICATION_FILE",
                 "else",
@@ -226,10 +148,10 @@
                 "fi"
             ],
             "download_librover": [
-                "mkdir -p ~/drivers",
-                "cd ~/drivers",
+                "mkdir -p ~/library",
+                "cd ~/library",
                 "git clone $KEY_LIBROVER $KEYV_LIBROVER",
-                "if [ -d ~/drivers/$KEYV_LIBROVER ]",
+                "if [ -d ~/library/$KEYV_LIBROVER ]",
                 "then",
                 "    echo \"download_librover: Success\" >> $KEY_VERIFICATION_FILE",
                 "else",
@@ -237,40 +159,15 @@
                 "fi"
             ],
             "install_librover": [
-                "cd ~/drivers/librover",
+                "cd ~/library/librover",
                 "cmake .",
+                "make",
                 "sudo make install",
                 "if [ -f /usr/lib/liblibrover.so ]",
                 "then",
                 "    echo \"install_librover: Success\" >> $KEY_VERIFICATION_FILE",
                 "else",
                 "    echo \"install_librover: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ]
-        }
-    ],
-    "setup_launch_pro": [
-        {
-            "replace_launch_file": [
-                "sudo sed -i 's/placeholder/$KEY_PRO_LAUNCH/g' /usr/sbin/roverrobotics",
-                "if grep \"$KEY_PRO_LAUNCH\" /usr/sbin/roverrobotics",
-                "then",
-                "    echo \"replace_launch_file: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"replace_launch_file: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-            ]
-        }
-    ],
-    "setup_launch_pro2": [
-        {
-            "replace_launch_file": [
-                "sudo sed -i 's/placeholder/$KEY_PRO2_LAUNCH/g' /usr/sbin/roverrobotics",
-                "if grep \"$KEY_PRO2_LAUNCH\" /usr/sbin/roverrobotics",
-                "then",
-                "    echo \"replace_launch_file: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"replace_launch_file: Failure\" >> $KEY_VERIFICATION_FILE",
                 "fi"
             ]
         }
@@ -323,36 +220,24 @@
             ]
         }
     ],
-    "catkin_make": [
+    "colcon_build": [
         {
             "update_ros_dep": [
-                "cd ~/catkin_ws",
+                "cd ~/rover_workspace",
                 "rosdep install --from-paths src --ignore-src -r -y",
-                "echo source ~/catkin_ws/devel/setup.bash >> ~/.bashrc",
-                "echo source /opt/ros/melodic/setup.bash >> ~/.bashrc",
+                "echo source ~/rover_workspace/install/setup.sh >> ~/.bashrc",
+                "echo source /opt/ros/humble/setup.bash >> ~/.bashrc",
                 "source ~/.bashrc",
-                "source /opt/ros/melodic/setup.bash",
-                "catkin_make"
+                "source /opt/ros/humble/setup.bash",
+                "colcon build"
             ]
         }
     ],
-    "start_rover_ros1_services": [
+    "start_rover_ros2_services": [
         {
-            "start_roscore_service": [
-                "source /opt/ros/melodic/setup.bash",
-                "source ~/catkin_ws/devel/setup.bash",
-                "sudo systemctl start roscore.service",
-                "if sudo systemctl status roscore.service | grep -i running",
-                "then",
-                "    echo \"start_roscore_service: Success\" >> $KEY_VERIFICATION_FILE",
-                "else",
-                "    echo \"start_roscore_service: Failure\" >> $KEY_VERIFICATION_FILE",
-                "fi"
-                
-            ],
             "start_roverrobotics_service": [
-                "source /opt/ros/melodic/setup.bash",
-                "source ~/catkin_ws/devel/setup.bash",
+                "source /opt/ros/humble/setup.bash",
+                "source ~/rover_workspace/install/setup.sh",
                 "sudo systemctl start roverrobotics.service",
                 "if sudo systemctl status roverrobotics.service | grep -i running",
                 "then",
@@ -366,18 +251,13 @@
     "uninstall_scripts": [
         {
             "remove-catkin_ws": [
-                "sed -i '/melodic/d' ~/.bashrc",
-                "sed -i '/catkin_ws/d' ~/.bashrc",
-                "sudo mv ~/catkin_ws/ ~/catkin_ws_old/",
-                "sudo rm -rf ~/drivers #librover and ps4 driver",
-                "sudo rm -rf ~/.local/lib/python2.7/site-packages/ds4drv-0.5.1-py2.7.egg #installed ps4 driver",
-                "sudo rm -rf ~/.local/bin/ds4drv",
-                "sudo rm -rf /etc/udev/rules.d/50-ds4drv.rules #ps4 udev",
+                "sed -i '/humble/d' ~/.bashrc",
+                "sed -i '/rover_workspace/d' ~/.bashrc",
+                "sudo mv ~/rover_workspace/ ~/catkin_ws_old/",
+                "sudo rm -rf ~/library #librover and ps4 driver",
                 "sudo rm -rf /etc/udev/rules.d/55-roverrobotics.rules #rover udev",
-                "sudo rm -rf ~/rover_tools/testing/$KEYV_ROVER_TESTS #robot test",
                 "sudo rm -rf /etc/roverrobotics #env",
                 "sudo rm -rf /usr/sbin/roverrobotics #selector",
-                "sudo rm -rf /etc/systemd/system/roscore.service #ros service",
                 "sudo rm -rf /etc/systemd/system/roverrobotics.service #robot service",
                 "sudo rm /etc/systemd/system/can.service #can startup",
                 "sudo rm -rf /enablecan.sh #can enabler",
