@@ -1,6 +1,8 @@
-# rover_tools
+# rover_tools_ros2
 
 Rover Tools are a new set of tools to help users quickly and easily install the required software to run a Rover robot. Rover tools are targetted for provisioning Ubuntu.
+
+This fork is being developed to easily install ros2 and our ros2 drivers for the Rover Mini and Mega.
 
 # install
 
