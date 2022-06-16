@@ -73,7 +73,7 @@
                 "#!/bin/bash",
                 "source ~/rover_workspace/install/setup.sh",
                 "source /etc/roverrobotics/env.sh",
-                "sudo chmod 666 /dev/ttyACM0"
+                "sudo chmod 666 /dev/ttyACM0",
                 "ros2 launch roverrobotics_driver mini_teleop.launch.py",
                 "PID=$!",
                 "wait \"$PID\"",
@@ -95,7 +95,7 @@
                 "#!/bin/bash",
                 "source ~/rover_workspace/install/setup.sh",
                 "source /etc/roverrobotics/env.sh",
-                "sudo chmod 666 /dev/ttyACM0"
+                "sudo chmod 666 /dev/ttyACM0",
                 "ros2 launch roverrobotics_driver mega_teleop.launch.py",
                 "PID=$!",
                 "wait \"$PID\"",
