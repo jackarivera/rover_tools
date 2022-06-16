@@ -14,6 +14,7 @@
     "$KEY_PRO_LAUNCH": "roverrobotics_driver pro_teleop.launch",
     "$KEY_PRO2_LAUNCH": "roverrobotics_driver pro2_teleop.launch",
     "$KEY_MINI_LAUNCH": "roverrobotics_driver mini_teleop.launch",
+    "$KEY_MEGA_LAUNCH": "roverrobotics_driver mega_teleop.launch",
     "$KEY_ZERO2_LAUNCH": "roverrobotics_driver zero2_teleop.launch",
     "$KEY_VERIFICATION_FILE": "~/rr-install-verification.file"
     

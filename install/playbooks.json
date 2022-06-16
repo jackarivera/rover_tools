@@ -6,8 +6,19 @@
         "roverrobotics_ros2",
         "can_service",
         "colcon_build",
-        "rover_startup_script",
+        "rover_startup_script_mini",
         "setup_launch_mini",
+        "start_rover_ros2_services"
+    ],
+    "mega_ros2": [
+        "uninstall_scripts",
+        "prereq",
+        "rover_ros_subsystem_files",
+        "roverrobotics_ros2",
+        "can_service",
+        "colcon_build",
+        "rover_startup_script",
+        "setup_launch_mega",
         "start_rover_ros2_services"
     ]
 }
