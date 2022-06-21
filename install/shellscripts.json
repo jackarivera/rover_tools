@@ -110,6 +110,50 @@
             ]
         }
     ],
+    "rover_startup_script_pro2": [
+        {
+            "create_startup_script": [
+                "cat << \"EOF2\" | sudo tee /usr/sbin/roverrobotics",
+                "#!/bin/bash",
+                "source ~/rover_workspace/install/setup.sh",
+                "source /etc/roverrobotics/env.sh",
+                "sudo chmod 666 /dev/ttyACM0",
+                "ros2 launch roverrobotics_driver pro2_teleop.launch.py",
+                "PID=$!",
+                "wait \"$PID\"",
+                "EOF2",
+                "sudo chmod +x /usr/sbin/roverrobotics",
+                "if [ -f /usr/sbin/roverrobotics ]",
+                "then",
+                "    echo \"create_startup_script: Success\" >> $KEY_VERIFICATION_FILE",
+                "else",
+                "    echo \"create_startup_script: Failure\" >> $KEY_VERIFICATION_FILE",
+                "fi"
+            ]
+        }
+    ],
+    "rover_startup_script_zero2": [
+        {
+            "create_startup_script": [
+                "cat << \"EOF2\" | sudo tee /usr/sbin/roverrobotics",
+                "#!/bin/bash",
+                "source ~/rover_workspace/install/setup.sh",
+                "source /etc/roverrobotics/env.sh",
+                "sudo chmod 666 /dev/ttyACM0",
+                "ros2 launch roverrobotics_driver zero2_teleop.launch.py",
+                "PID=$!",
+                "wait \"$PID\"",
+                "EOF2",
+                "sudo chmod +x /usr/sbin/roverrobotics",
+                "if [ -f /usr/sbin/roverrobotics ]",
+                "then",
+                "    echo \"create_startup_script: Success\" >> $KEY_VERIFICATION_FILE",
+                "else",
+                "    echo \"create_startup_script: Failure\" >> $KEY_VERIFICATION_FILE",
+                "fi"
+            ]
+        }
+    ],
     "can_service": [
         {
             "create_can_service": [
@@ -159,7 +203,7 @@
     ],
     "roverrobotics_ros2": [
         {
-            "download_roverrobotics_ros1": [
+            "download_roverrobotics_ros2": [
                 "mkdir -p ~/rover_workspace/src",
                 "cd ~/rover_workspace/src/",
                 "git clone $KEY_ROVER_ROS2",
@@ -227,6 +271,19 @@
         {
             "replace_launch_file": [
                 "sudo sed -i 's/placeholder/$KEY_ZERO2_LAUNCH/g' /usr/sbin/roverrobotics",
+                "if grep \"$KEY_ZERO2_LAUNCH\" /usr/sbin/roverrobotics",
+                "then",
+                "    echo \"replace_launch_file: Success\" >> $KEY_VERIFICATION_FILE",
+                "else",
+                "    echo \"replace_launch_file: Failure\" >> $KEY_VERIFICATION_FILE",
+                "fi"
+            ]
+        }
+    ],
+    "setup_launch_pro2": [
+        {
+            "replace_launch_file": [
+                "sudo sed -i 's/placeholder/$KEY_PRO2_LAUNCH/g' /usr/sbin/roverrobotics",
                 "if grep \"$KEY_ZERO2_LAUNCH\" /usr/sbin/roverrobotics",
                 "then",
                 "    echo \"replace_launch_file: Success\" >> $KEY_VERIFICATION_FILE",

@@ -1,5 +1,5 @@
 {
-    "mini_ros2": [
+    "Rover Mini ROS2": [
         "uninstall_scripts",
         "prereq",
         "rover_ros_subsystem_files",
@@ -10,15 +10,41 @@
         "setup_launch_mini",
         "start_rover_ros2_services"
     ],
-    "mega_ros2": [
+    "Rover Mega ROS2": [
         "uninstall_scripts",
         "prereq",
         "rover_ros_subsystem_files",
         "roverrobotics_ros2",
         "can_service",
         "colcon_build",
-        "rover_startup_script",
+        "rover_startup_script_mega",
         "setup_launch_mega",
         "start_rover_ros2_services"
+    ],
+    "Rover Pro ROS2": [
+        "uninstall_scripts",
+        "prereq",
+        "rover_ros_subsystem_files",
+        "roverrobotics_ros2",
+        "can_service",
+        "colcon_build",
+        "rover_startup_script_pro2",
+        "setup_launch_pro2",
+        "start_rover_ros2_services"
+    ],
+    "Rover Zero2 ROS2": [
+        "uninstall_scripts",
+        "prereq",
+        "rover_ros_subsystem_files",
+        "roverrobotics_ros2",
+        "can_service",
+        "colcon_build",
+        "rover_startup_script_zero2",
+        "setup_launch_zero2",
+        "start_rover_ros2_services"
+    ],
+    "Slam and Lidar Pack": [
+    ],
+    "Sparkfun Razor IMU Pack": [
     ]
 }
