@@ -9,11 +9,31 @@
                 "sudo apt update",
                 "sudo apt upgrade"
             ],
-            "install-utils": "sudo apt-get install git nano can-utils net-tools openssh-server ros-humble-desktop python3-rosdep2 python3-colcon-common-extensions ros-humble-slam-toolbox ros-humble-robot-localization",
+            "install-utils": "sudo apt-get install git nano can-utils net-tools openssh-server ros-$DISTRO-desktop python3-rosdep2 python3-colcon-common-extensions ros-$DISTRO-robot-localization",
             "remove-modemmanger": "sudo apt-get remove modemmanager -y",
             "update-ros-dept": [
                 "sudo rosdep init",
                 "rosdep update"
+            ]
+        }
+    ],
+    "install_slampack": [
+        {
+            "clone_source_and_build": [
+                "sudo apt install ros-$DISTRO-slam-toolbox",
+                "source ~/opt/ros/$DISTRO/setup.bash",
+                "source install/setup.sh"
+            ]
+        }
+    ],
+    "install_imupack": [
+        {
+            "clone_source_and_build": [
+                "cd ~/rover_workspace/src",
+                "git clone $KEY_IMU_SOURCE",
+                "cd ~/rover_workspace",
+                "colcon build",
+                "source install/setup.sh"
             ]
         }
     ],
@@ -206,6 +226,8 @@
             "download_roverrobotics_ros2": [
                 "mkdir -p ~/rover_workspace/src",
                 "cd ~/rover_workspace/src/",
+                "cd ~/rover_workspace",
+                "rosdep install -i --from-path src --ignore-src",
                 "git clone $KEY_ROVER_ROS2",
                 "if [ -d ~/rover_workspace/src/$KEYV_ROVER_ROS2 ]",
                 "then",
@@ -320,9 +342,9 @@
                 "cd ~/rover_workspace",
                 "rosdep install --from-paths src --ignore-src -r -y",
                 "echo source ~/rover_workspace/install/setup.sh >> ~/.bashrc",
-                "echo source /opt/ros/humble/setup.bash >> ~/.bashrc",
+                "echo source /opt/ros/$DISTRO/setup.bash >> ~/.bashrc",
                 "source ~/.bashrc",
-                "source /opt/ros/humble/setup.bash",
+                "source /opt/ros/$DISTRO/setup.bash",
                 "colcon build"
             ]
         }
@@ -330,7 +352,7 @@
     "start_rover_ros2_services": [
         {
             "start_roverrobotics_service": [
-                "source /opt/ros/humble/setup.bash",
+                "source /opt/ros/$DISTRO/setup.bash",
                 "source ~/rover_workspace/install/setup.sh",
                 "sudo systemctl start roverrobotics.service",
                 "if sudo systemctl status roverrobotics.service | grep -i running",
@@ -344,10 +366,10 @@
     ],
     "uninstall_scripts": [
         {
-            "remove-catkin_ws": [
-                "sed -i '/humble/d' ~/.bashrc",
+            "remove-rover_ws": [
+                "sed -i '/$DISTRO/d' ~/.bashrc",
                 "sed -i '/rover_workspace/d' ~/.bashrc",
-                "sudo mv ~/rover_workspace/ ~/catkin_ws_old/",
+                "sudo mv ~/rover_workspace/ ~/rover_ws_old/",
                 "sudo rm -rf ~/library #librover and ps4 driver",
                 "sudo rm -rf /etc/udev/rules.d/55-roverrobotics.rules #rover udev",
                 "sudo rm -rf /etc/roverrobotics #env",

@@ -25,6 +25,7 @@
         "uninstall_scripts",
         "prereq",
         "rover_ros_subsystem_files",
+        "create_udev",
         "roverrobotics_ros2",
         "can_service",
         "colcon_build",
@@ -36,6 +37,7 @@
         "uninstall_scripts",
         "prereq",
         "rover_ros_subsystem_files",
+        "create_udev",
         "roverrobotics_ros2",
         "can_service",
         "colcon_build",
@@ -44,7 +46,9 @@
         "start_rover_ros2_services"
     ],
     "Slam and Lidar Pack": [
+        "install_slampack"
     ],
-    "Sparkfun Razor IMU Pack": [
+    "BNO055 IMU Pack": [
+        "install_imupack"
     ]
 }
