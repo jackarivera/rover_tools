@@ -59,7 +59,7 @@ menu.append_item(build_install_submenu(menu, mfgdb))
 #menu.append_item(build_calibration_submenu(menu, mfgdb))
 
 # testing
-menu.append_item(build_testing_submenu(menu, mfgdb))
+# menu.append_item(build_testing_submenu(menu, mfgdb))
 
 # device registration (removed)
 if launch_production_menu:
