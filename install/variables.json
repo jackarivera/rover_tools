@@ -16,6 +16,7 @@
     "$KEY_MINI_LAUNCH": "roverrobotics_driver mini_teleop.launch",
     "$KEY_MEGA_LAUNCH": "roverrobotics_driver mega_teleop.launch",
     "$KEY_ZERO2_LAUNCH": "roverrobotics_driver zero2_teleop.launch",
-    "$KEY_VERIFICATION_FILE": "~/rr-install-verification.file"
-    
+    "$KEY_VERIFICATION_FILE": "~/rr-install-verification.file",
+    "$KEY_IMU_SOURCE": "https://github.com/jackarivera/ros2_bno055_driver.git",
+    "$DISTRO": "humble"
 }
